@@ -16,6 +16,12 @@ std::string Decimal::str(void) const
     return this->val;
 }
 
+void Decimal::normalize(void)
+{
+    if (this->val == "-0" or this->val == "+0")
+        this->val.replace(0, 1, "");
+}
+
 
 // CTOR/DTOR
 Decimal::Decimal(void):
@@ -32,7 +38,9 @@ Decimal::Decimal(double n):
 
 Decimal::Decimal(const std::string& n):
     val(n)
-{}
+{
+    this->normalize();
+}
 
 Decimal::Decimal(const Decimal& other):
     val(other.val)

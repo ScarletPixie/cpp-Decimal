@@ -34,6 +34,9 @@ class Decimal
     private:
         std::string val;
 
+        ///@brief Removes meaningless signals.
+        void normalize(void);
+
 };
 
 #endif
