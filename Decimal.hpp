@@ -3,6 +3,8 @@
 
 #include <string>
 #include <vector>
+#include <exception>
+
 
 class Decimal
 {
@@ -31,11 +33,18 @@ class Decimal
         bool operator < (const Decimal& rhs) const;
         bool operator > (const Decimal& rhs) const;
 
+        class InvalidFormatException: public std::exception
+        {
+            public:
+                const char* what(void) const throw();
+        };
+
     private:
         std::string val;
 
         ///@brief Removes plus sign, also removes leading zeroes and trailing zeroes after dot.
         void normalize(void);
+        void validate(const std::string& n) const;
 
 };
 

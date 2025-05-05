@@ -4,6 +4,14 @@
 
 #include <string>
 
+TEST_CASE("Test Decimal instantiation with invalid values will throw exception", "[Decimal instantiation]")
+{
+    SECTION("Valid number with multiple signals")
+    {
+        REQUIRE_THROWS_AS(Decimal("++10"), const Decimal::InvalidFormatException&);
+    }
+}
+
 TEST_CASE("Test Decimal instantiation creates a Decimal object with the correct value", "[Decimal instantiation]")
 {
     SECTION("Simple positive number")
@@ -24,10 +32,10 @@ TEST_CASE("Test Decimal instantiation creates a Decimal object with the correct 
 
         const std::string& largeNum = "9999999999999999999999999999999999999999999999999999999999999999";
         REQUIRE(Decimal(largeNum).str() == largeNum);
-
         
         REQUIRE(Decimal("0001.0").num() == 1);
         REQUIRE(Decimal("+0001.0").str() == "1");
+        REQUIRE(Decimal("+0101.10").str() == "101.1");
     }
 
     SECTION("Simple negative number")

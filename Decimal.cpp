@@ -2,6 +2,7 @@
 
 #include <sstream>
 #include <algorithm>
+#include <cctype>
 
 // METHODS
 double Decimal::num(void) const
@@ -41,7 +42,26 @@ void Decimal::normalize(void)
 
     if (this->val[0] == '+')
         this->val.replace(0, 1, "");
-    
+}
+
+void Decimal::validate(const std::string& n) const
+{
+    if (n.empty())
+        throw InvalidFormatException();
+
+    const std::size_t startPos = n[0] == '-' or n[0] == '+';
+
+    bool commaFound = false;
+    for (std::size_t i = startPos; i < n.size(); ++i)
+    {
+        if (n[i] == '.' and not commaFound)
+        {
+            commaFound = true;
+            continue;
+        }
+        if (not isdigit(n[i]))
+            throw InvalidFormatException();
+    }
 }
 
 
@@ -61,6 +81,7 @@ Decimal::Decimal(double n):
 Decimal::Decimal(const std::string& n):
     val(n)
 {
+    this->validate(n);
     this->normalize();
 }
 
@@ -70,3 +91,10 @@ Decimal::Decimal(const Decimal& other):
 
 Decimal::~Decimal(void)
 {}
+
+
+// EXCEPTIONS
+const char* Decimal::InvalidFormatException::what(void) const throw()
+{
+    return "Decimal: Bad string format";
+}
