@@ -96,6 +96,24 @@ Decimal::~Decimal(void)
 {}
 
 
+// ARITHMETIC OPERATORS
+Decimal Decimal::operator + (const Decimal& rhs) const
+{
+    return Decimal(rhs);
+}
+
+// OPERATORS
+Decimal& Decimal::operator = (const Decimal& rhs)
+{
+    this->val = rhs.val;
+    return *this;
+}
+bool Decimal::operator == (const Decimal& rhs) const
+{
+    return this->val == rhs.val;
+}
+
+
 // EXCEPTIONS
 const char* Decimal::InvalidFormatException::what(void) const throw()
 {
