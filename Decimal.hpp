@@ -34,7 +34,7 @@ class Decimal
     private:
         std::string val;
 
-        ///@brief Removes meaningless signals.
+        ///@brief Removes plus sign, also removes leading zeroes and trailing zeroes after dot.
         void normalize(void);
 
 };

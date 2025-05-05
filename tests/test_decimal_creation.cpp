@@ -24,6 +24,10 @@ TEST_CASE("Test Decimal instantiation creates a Decimal object with the correct 
 
         const std::string& largeNum = "9999999999999999999999999999999999999999999999999999999999999999";
         REQUIRE(Decimal(largeNum).str() == largeNum);
+
+        
+        REQUIRE(Decimal("0001.0").num() == 1);
+        REQUIRE(Decimal("+0001.0").str() == "1");
     }
 
     SECTION("Simple negative number")
@@ -37,6 +41,8 @@ TEST_CASE("Test Decimal instantiation creates a Decimal object with the correct 
         
         const std::string& largeNum = "-9999999999999999999999999999999999999999999999999999999999999999";
         REQUIRE(Decimal(largeNum).str() == largeNum);
+        REQUIRE(Decimal("-0001.0").num() == -1);
+        REQUIRE(Decimal("-0001.0").str() == "-1");
     }
 
     SECTION("Fractional number")
@@ -48,5 +54,7 @@ TEST_CASE("Test Decimal instantiation creates a Decimal object with the correct 
 
         const std::string& largeNum = "-9999999999999999999999999999999999999999999999999999999999999999.000000000000000000000000000000021";
         REQUIRE(Decimal(largeNum).str() == largeNum);
+        REQUIRE(Decimal("-0001.100").num() == -1.1);
+        REQUIRE(Decimal("-0001.100").str() == "-1.1");
     }
 }
