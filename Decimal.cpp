@@ -51,6 +51,9 @@ void Decimal::validate(const std::string& n) const
 
     const std::size_t startPos = n[0] == '-' or n[0] == '+';
 
+    if (startPos != 0 and n.size() == 1)
+        throw InvalidFormatException();
+
     bool commaFound = false;
     for (std::size_t i = startPos; i < n.size(); ++i)
     {

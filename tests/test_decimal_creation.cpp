@@ -9,6 +9,8 @@ TEST_CASE("Test Decimal instantiation with invalid values will throw exception",
     SECTION("Valid number with multiple signals")
     {
         REQUIRE_THROWS_AS(Decimal("++10"), const Decimal::InvalidFormatException&);
+        REQUIRE_THROWS_AS(Decimal("++"), const Decimal::InvalidFormatException&);
+        REQUIRE_THROWS_AS(Decimal("-"), const Decimal::InvalidFormatException&);
     }
 }
 
