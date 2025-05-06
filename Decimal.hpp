@@ -2,7 +2,7 @@
 #define DECIMAL_HPP
 
 #include <string>
-#include <vector>
+#include <deque>
 #include <exception>
 
 
@@ -45,6 +45,9 @@ class Decimal
         ///@brief Removes plus sign, also removes leading zeroes and trailing zeroes after dot.
         void normalize(void);
         void validate(const std::string& n) const;
+
+        static void front_pad(std::deque<char>& v, std::size_t size);
+        static void back_pad(std::deque<char>& v, std::size_t size);
 
 };
 

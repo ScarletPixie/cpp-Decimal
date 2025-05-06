@@ -66,6 +66,16 @@ void Decimal::validate(const std::string& n) const
             throw InvalidFormatException();
     }
 }
+void Decimal::front_pad(std::deque<char>& v, std::size_t size)
+{
+    for (std::size_t i = 0; i < size; ++i)
+        v.push_front('0');
+}
+void Decimal::back_pad(std::deque<char>& v, std::size_t size)
+{
+    for (std::size_t i = 0; i < size; ++i)
+        v.push_back('0');
+}
 
 
 // CTOR/DTOR
@@ -100,8 +110,8 @@ Decimal::~Decimal(void)
 Decimal Decimal::operator + (const Decimal& rhs) const
 {
     std::string result;
-    std::pair<std::vector<char>, std::vector<char> > lhsDigits;
-    std::pair<std::vector<char>, std::vector<char> > rhsDigits;
+    std::pair<std::deque<char>, std::deque<char> > lhsDigits;
+    std::pair<std::deque<char>, std::deque<char> > rhsDigits;
 
     bool fractPart = false;
     for (std::size_t i = 0; i < this->val.size(); ++i)
@@ -137,19 +147,80 @@ Decimal Decimal::operator + (const Decimal& rhs) const
     if (lhsDigits.first.size() != rhsDigits.first.size())
     {
         const std::size_t diff = std::max(lhsDigits.first.size(), rhsDigits.first.size()) - std::min(lhsDigits.first.size(), rhsDigits.first.size()); 
-        Decimal::front_pad((lhsDigits.first.size() > rhsDigits.size() ? lhsDigits.first : rhsDigits.first), diff);
+        Decimal::front_pad((lhsDigits.first.size() > rhsDigits.first.size() ? lhsDigits.first : rhsDigits.first), diff);
     }
     if (lhsDigits.second.size() != rhsDigits.second.size())
     {
         const std::size_t diff = std::max(lhsDigits.second.size(), rhsDigits.second.size()) - std::min(lhsDigits.second.size(), rhsDigits.second.size()); 
-        Decimal::back_pad((lhsDigits.second.size() > rhsDigits.size() ? lhsDigits.second : rhsDigits.second), diff);
+        Decimal::back_pad((lhsDigits.second.size() > rhsDigits.second.size() ? lhsDigits.second : rhsDigits.second), diff);
     }
 
+  
 
+        
+    int buffer = 0;
+    if (lhsDigits.second.size())
+    {
+        std::deque<char>::reverse_iterator rhsIt = rhsDigits.second.rbegin();
+        std::deque<char>::reverse_iterator lhsIt = lhsDigits.second.rbegin();
 
+        while (rhsIt != rhsDigits.second.rend())
+        {
+            int rhsVal = *rhsIt - '0';
+            int lhsVal = *lhsIt - '0';
+            
+            if (buffer)
+            {
+                lhsVal += 10;
+                buffer = 0;
+            }
 
-    return Decimal(rhs);
+            int res = lhsVal + rhsVal;
+            buffer = (res / 10) % 10;
+
+            if (buffer)
+                res /= 10;
+            
+            result.push_back(res + '0');
+
+            ++rhsIt;
+            ++lhsIt;
+        }
+        result.append(".");
+    }
+    if (lhsDigits.first.size())
+    {
+        std::deque<char>::reverse_iterator rhsIt = rhsDigits.first.rbegin();
+        std::deque<char>::reverse_iterator lhsIt = lhsDigits.first.rbegin();
+        while (rhsIt != rhsDigits.first.rend())
+        {
+            int rhsVal = *rhsIt - '0';
+            int lhsVal = *lhsIt - '0';
+            
+            if (buffer)
+            {
+                lhsVal += 10;
+                buffer = 0;
+            }
+
+            int res = lhsVal + rhsVal;
+            buffer = (res / 10) % 10;
+
+            if (buffer)
+                res /= 10;
+            
+            result.push_back(res + '0');
+
+            ++rhsIt;
+            ++lhsIt;
+        }
+        if (buffer)
+            result.append("1");
+    }
+    std::reverse(result.begin(), result.end());
+    return Decimal(result);
 }
+
 
 // OPERATORS
 Decimal& Decimal::operator = (const Decimal& rhs)
