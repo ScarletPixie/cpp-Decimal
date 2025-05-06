@@ -99,6 +99,55 @@ Decimal::~Decimal(void)
 // ARITHMETIC OPERATORS
 Decimal Decimal::operator + (const Decimal& rhs) const
 {
+    std::string result;
+    std::pair<std::vector<char>, std::vector<char> > lhsDigits;
+    std::pair<std::vector<char>, std::vector<char> > rhsDigits;
+
+    bool fractPart = false;
+    for (std::size_t i = 0; i < this->val.size(); ++i)
+    {
+        if (this->val[i] == '.')
+        {
+            fractPart = true;
+            continue;
+        }
+        else if (!isdigit(this->val[i]))
+            continue;
+        if (fractPart)
+            lhsDigits.second.push_back(this->val[i]);
+        else
+            lhsDigits.first.push_back(this->val[i]);
+    }
+    fractPart = false;
+    for (std::size_t i = 0; i < rhs.val.size(); ++i)
+    {
+        if (rhs.val[i] == '.')
+        {
+            fractPart = true;
+            continue;
+        }
+        else if (!isdigit(rhs.val[i]))
+            continue;
+        if (fractPart)
+            rhsDigits.second.push_back(rhs.val[i]);
+        else
+            rhsDigits.first.push_back(rhs.val[i]);
+    }
+
+    if (lhsDigits.first.size() != rhsDigits.first.size())
+    {
+        const std::size_t diff = std::max(lhsDigits.first.size(), rhsDigits.first.size()) - std::min(lhsDigits.first.size(), rhsDigits.first.size()); 
+        Decimal::front_pad((lhsDigits.first.size() > rhsDigits.size() ? lhsDigits.first : rhsDigits.first), diff);
+    }
+    if (lhsDigits.second.size() != rhsDigits.second.size())
+    {
+        const std::size_t diff = std::max(lhsDigits.second.size(), rhsDigits.second.size()) - std::min(lhsDigits.second.size(), rhsDigits.second.size()); 
+        Decimal::back_pad((lhsDigits.second.size() > rhsDigits.size() ? lhsDigits.second : rhsDigits.second), diff);
+    }
+
+
+
+
     return Decimal(rhs);
 }
 
