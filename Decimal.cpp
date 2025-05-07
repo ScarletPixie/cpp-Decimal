@@ -147,12 +147,12 @@ Decimal Decimal::operator + (const Decimal& rhs) const
     if (lhsDigits.first.size() != rhsDigits.first.size())
     {
         const std::size_t diff = std::max(lhsDigits.first.size(), rhsDigits.first.size()) - std::min(lhsDigits.first.size(), rhsDigits.first.size()); 
-        Decimal::front_pad((lhsDigits.first.size() > rhsDigits.first.size() ? lhsDigits.first : rhsDigits.first), diff);
+        Decimal::front_pad((lhsDigits.first.size() < rhsDigits.first.size() ? lhsDigits.first : rhsDigits.first), diff);
     }
     if (lhsDigits.second.size() != rhsDigits.second.size())
     {
         const std::size_t diff = std::max(lhsDigits.second.size(), rhsDigits.second.size()) - std::min(lhsDigits.second.size(), rhsDigits.second.size()); 
-        Decimal::back_pad((lhsDigits.second.size() > rhsDigits.second.size() ? lhsDigits.second : rhsDigits.second), diff);
+        Decimal::back_pad((lhsDigits.second.size() < rhsDigits.second.size() ? lhsDigits.second : rhsDigits.second), diff);
     }
 
   
