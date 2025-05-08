@@ -248,7 +248,18 @@ Decimal Decimal::operator + (const Decimal& rhs) const
 }
 Decimal Decimal::operator - (const Decimal& rhs) const
 {
-    (void)rhs;
+    const Decimal* n1 = this;
+    const Decimal* n2 = &rhs;
+    if (this->val[0] != '-' and rhs.val[0] == '-')
+        return *this + Decimal(rhs.val.substr(1));
+    if (rhs > *this)
+    {
+        n1 = &rhs;
+        n2 = this;
+    }
+
+    
+
     return Decimal();
 }
 
