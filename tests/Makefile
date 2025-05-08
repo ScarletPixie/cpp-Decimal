@@ -9,7 +9,7 @@ TEST_SUBJ_OBJS := ${TEST_SUBJ_SRCS:.cpp=.o}
 TEST_SUBJ_OBJS := $(subst ../,,$(TEST_SUBJ_OBJS))
 
 BUILD := ./build/
-CFLGS := -Wall -Wextra -Werror -std=c++98 -ggdb3 -DDEBUG -O0
+CFLGS := -Wall -Wextra -Werror -std=c++98 -ggdb3 -DDEBUG -O0 -fsanitize=address
 
 OBJS := $(foreach OBJ, ${TEST_OBJS} ${TEST_SUBJ_OBJS}, $(BUILD)$(OBJ))
 

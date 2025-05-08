@@ -14,6 +14,7 @@ TEST_CASE("Test Decimal instantiation with invalid values will throw exception",
         REQUIRE_THROWS_AS(Decimal(""), const Decimal::InvalidFormatException&);
         REQUIRE_THROWS_AS(Decimal(" "), const Decimal::InvalidFormatException&);
         REQUIRE_THROWS_AS(Decimal("50ab"), const Decimal::InvalidFormatException&);
+        REQUIRE_THROWS_AS(Decimal("50-"), const Decimal::InvalidFormatException&);
     }
 }
 

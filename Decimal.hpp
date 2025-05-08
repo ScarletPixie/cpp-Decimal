@@ -3,6 +3,7 @@
 
 #include <string>
 #include <deque>
+#include <vector>
 #include <exception>
 
 
@@ -36,11 +37,19 @@ class Decimal
         class InvalidFormatException: public std::exception
         {
             public:
+                InvalidFormatException(const std::string& message);
                 const char* what(void) const throw();
+                virtual ~InvalidFormatException(void) throw();
+            private:
+                const std::string& message;
         };
 
     private:
         std::string val;
+        std::deque<char> ipart;
+        std::vector<char> fpart;
+
+        void updateFromVal(void);
 
         ///@brief Removes plus sign, also removes leading zeroes and trailing zeroes after dot.
         void normalize(void);
