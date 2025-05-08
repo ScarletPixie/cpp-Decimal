@@ -34,6 +34,8 @@ class Decimal
         bool operator < (const Decimal& rhs) const;
         bool operator > (const Decimal& rhs) const;
 
+        Decimal operator - (void) const;
+
         class InvalidFormatException: public std::exception
         {
             public:

@@ -1,10 +1,12 @@
 #include "Decimal.hpp"
 
+#include <cstddef>
 #include <iostream>
 #include <sstream>
 #include <algorithm>
 #include <cctype>
 #include <vector>
+#include <stack>
 
 
 static std::size_t getDiff(std::size_t n1, std::size_t n2);
@@ -144,8 +146,10 @@ Decimal Decimal::operator + (const Decimal& rhs) const
 
     if (this->val[0] == '-' and rhs.val[0] == '-')
         isNegativeResult = true;
-    else if (this->val[0] == '-' or rhs.val[0] == '-')
-        return *this - rhs;
+    else if (this->val[0] == '-')
+        return Decimal(this->val.substr(1)) - rhs;
+    else if (rhs.val[0] == '-')
+        return *this - Decimal(rhs.val.substr(1));
 
     int carry = 0;
     const std::size_t maxDigitCount = std::max(this->ipart.size(), rhs.ipart.size());
@@ -248,22 +252,125 @@ Decimal Decimal::operator + (const Decimal& rhs) const
 }
 Decimal Decimal::operator - (const Decimal& rhs) const
 {
+    bool negativeResult = false;
     const Decimal* n1 = this;
     const Decimal* n2 = &rhs;
+
     if (this->val[0] != '-' and rhs.val[0] == '-')
         return *this + Decimal(rhs.val.substr(1));
+    else if (this->val[0] == '-' and rhs.val[0] != '-')
+        return -(rhs + Decimal(this->val.substr(1)));
     if (rhs > *this)
     {
         n1 = &rhs;
         n2 = this;
+        negativeResult = true;
     }
 
-    
+    std::string result;
+    const std::size_t maxIntDigitCount = std::max(this->ipart.size(), rhs.ipart.size());
+    const std::size_t maxFractDigitCount = std::max(this->fpart.size(), rhs.fpart.size());
 
-    return Decimal();
+    std::stack<int> loan;
+    std::stack<int> debt;
+
+    // FRACTIONAL PART
+    if (maxFractDigitCount)
+    {
+        const std::size_t fractSizeDiff = getDiff(this->fpart.size(), rhs.fpart.size());
+        const std::size_t minSizeCount = std::min(this->fpart.size(), rhs.fpart.size());
+
+        std::vector<char>::const_reverse_iterator lhsIt = n1->fpart.rbegin();
+        std::vector<char>::const_reverse_iterator rhsIt = n2->fpart.rbegin();
+        std::vector<char>::const_reverse_iterator* it = (n1->fpart.size() > n2->fpart.size() ? &lhsIt : &rhsIt);
+        for (std::size_t i = 0; i < fractSizeDiff; ++i)
+        {
+            result.push_back(**it);
+            ++(*it);
+        }
+
+        bool rhsEnd = false;
+        bool lhsEnd = false;
+        for (std::size_t i = 0; i < minSizeCount; ++i)
+        {
+            if (rhsIt == rhs.fpart.rend())
+                rhsEnd = true;
+            if (lhsIt == this->fpart.rend())
+                lhsEnd = true;
+            
+            int lhsVal = (!lhsEnd ? *lhsIt - '0' : 0);
+            int rhsVal = (!rhsEnd ? *rhsIt - '0' : 0);
+
+            // apply debt
+            if (!debt.empty())
+            {
+                lhsVal -= 1;
+                debt.pop();
+            }
+
+            // debt carry over/operation
+            if (lhsVal < 0)
+            {
+                debt.push(1);
+                lhsVal = 9;
+            }
+            else if (lhsVal < rhsVal)
+            {
+                debt.push(1);
+                lhsVal += 10;
+            }
+        }
+        result.push_back('.');
+    }
+
+    // INTEGER PART
+    bool rhsEnd = false;
+    bool lhsEnd = false;
+    std::deque<char>::const_reverse_iterator lhsIt = n1->ipart.rbegin();
+    std::deque<char>::const_reverse_iterator rhsIt = n2->ipart.rbegin();
+    for (std::size_t i = 0; i < maxIntDigitCount; ++i)
+    {
+        if (rhsIt == rhs.ipart.rend())
+            rhsEnd = true;
+        if (lhsIt == this->ipart.rend())
+            lhsEnd = true;
+        
+        int lhsVal = (!lhsEnd ? *lhsIt - '0' : 0);
+        int rhsVal = (!rhsEnd ? *rhsIt - '0' : 0);
+
+        // apply debt
+        if (!debt.empty())
+        {
+            lhsVal -= 1;
+            debt.pop();
+        }
+
+        // debt carry over/operation
+        if (lhsVal < 0)
+        {
+            debt.push(1);
+            lhsVal = 9;
+        }
+        else if (lhsVal < rhsVal)
+        {
+            debt.push(1);
+            lhsVal += 10;
+        }
+    }
+
+    if (negativeResult)
+        result.push_back('-');
+    std::reverse(result.begin(), result.end());
+    return Decimal(result);
 }
 
 // OPERATORS
+Decimal Decimal::operator - (void) const
+{
+    if (this->val[0] == '-')
+        return Decimal(this->val.substr(1));
+    return Decimal("-" + this->val);
+}
 Decimal& Decimal::operator = (const Decimal& rhs)
 {
     this->val = rhs.val;
@@ -275,6 +382,32 @@ bool Decimal::operator == (const Decimal& rhs) const
 {
     return this->val == rhs.val;
 }
+bool Decimal::operator > (const Decimal& rhs) const
+{
+    if (this->ipart.size() > rhs.ipart.size())
+        return true;
+    else if (rhs.ipart.size() > this->ipart.size())
+        return false;
+
+    for (std::size_t i = 0; i < this->ipart.size(); ++i)
+    {
+        if (this->ipart[i] != rhs.ipart[i])
+            return this->ipart[i] > rhs.ipart[i];
+    }
+
+    const std::size_t maxFractDigits = std::max(this->fpart.size(), rhs.fpart.size());
+    for (std::size_t i = 0; i < maxFractDigits; ++i)
+    {
+        const int lhsVal = (i < this->fpart.size() ? this->fpart.size() - '0' : 0);
+        const int rhsVal = (i < rhs.fpart.size() ? rhs.fpart.size() - '0' : 0);
+
+        if (lhsVal != rhsVal)
+            return lhsVal < rhsVal;
+    }
+
+    return false;
+}
+
 
 
 // EXCEPTIONS

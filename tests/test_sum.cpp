@@ -29,6 +29,7 @@ TEST_CASE("Test decimal returns a Decimal with thr correct result", "[Decimal su
         REQUIRE((Decimal(0) + Decimal("51")) == Decimal("51"));
         REQUIRE((Decimal(100.50) + Decimal("51")) == Decimal("151.50"));
         REQUIRE((Decimal(-10) + Decimal(-10)) == Decimal("-20"));
+        //raise(SIGTRAP);
         REQUIRE((Decimal(5) + Decimal("-2")) == Decimal("3"));
     }
 }
