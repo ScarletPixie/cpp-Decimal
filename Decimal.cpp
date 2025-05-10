@@ -396,7 +396,13 @@ bool Decimal::operator == (const Decimal& rhs) const
 }
 bool Decimal::operator > (const Decimal& rhs) const
 {
-    if (this->ipart.size() > rhs.ipart.size())
+    if (this->val[0] == '-' and rhs.val[0] == '-')
+        return !(-(*this) > -rhs);
+    else if (this->val[0] == '-')
+        return false;
+    else if (rhs.val[0] == '-')
+        return true;
+    else if (this->ipart.size() > rhs.ipart.size())
         return true;
     else if (rhs.ipart.size() > this->ipart.size())
         return false;

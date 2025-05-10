@@ -28,7 +28,12 @@ TEST_CASE("Test decimal sub returns a Decimal with the correct result", "[Decima
         REQUIRE((Decimal(0) - Decimal("0.5")) == Decimal("-0.5"));
         REQUIRE((Decimal(0) - Decimal("51")) == Decimal("-51"));
         REQUIRE((Decimal(100.50) - Decimal("51")) == Decimal("49.50"));
+    }
+    SECTION("mixted")
+    {
         REQUIRE((Decimal(-10) - Decimal(-10)) == Decimal("0"));
+        REQUIRE((Decimal(-10) - Decimal(-11)) == Decimal("1"));
+        REQUIRE((Decimal(-2) - Decimal(5)) == Decimal("-7"));
         REQUIRE((Decimal(5) - Decimal("-2")) == Decimal("7"));
     }
 }
