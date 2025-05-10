@@ -256,10 +256,12 @@ Decimal Decimal::operator - (const Decimal& rhs) const
     const Decimal* n1 = this;
     const Decimal* n2 = &rhs;
 
-    if (this->val[0] != '-' and rhs.val[0] == '-')
-        return *this + Decimal(rhs.val.substr(1));
-    else if (this->val[0] == '-' and rhs.val[0] != '-')
-        return -(rhs + Decimal(this->val.substr(1)));
+    if (this->val[0] == '-' and rhs.val[0] != '-')
+        return *this + -rhs;
+    else if (this->val[0] != '-' and rhs.val[0] == '-')
+       return *this + Decimal(rhs.val.substr(1));
+   // else if (this->val[0] == '-' and rhs.val[0] != '-')
+     //   return -(rhs + Decimal(this->val.substr(1)));
     if (rhs > *this)
     {
         n1 = &rhs;
@@ -293,9 +295,9 @@ Decimal Decimal::operator - (const Decimal& rhs) const
         bool lhsEnd = false;
         for (std::size_t i = 0; i < minSizeCount; ++i)
         {
-            if (rhsIt == rhs.fpart.rend())
+            if (rhsIt == n2->fpart.rend())
                 rhsEnd = true;
-            if (lhsIt == this->fpart.rend())
+            if (lhsIt == n1->fpart.rend())
                 lhsEnd = true;
             
             int lhsVal = (!lhsEnd ? *lhsIt - '0' : 0);
@@ -319,6 +321,11 @@ Decimal Decimal::operator - (const Decimal& rhs) const
                 debt.push(1);
                 lhsVal += 10;
             }
+            result.push_back(lhsVal - rhsVal + '0');
+            if (!lhsEnd)
+                ++lhsIt;
+            if (!rhsEnd)
+                ++rhsIt;
         }
         result.push_back('.');
     }
@@ -330,9 +337,9 @@ Decimal Decimal::operator - (const Decimal& rhs) const
     std::deque<char>::const_reverse_iterator rhsIt = n2->ipart.rbegin();
     for (std::size_t i = 0; i < maxIntDigitCount; ++i)
     {
-        if (rhsIt == rhs.ipart.rend())
+        if (rhsIt == n2->ipart.rend())
             rhsEnd = true;
-        if (lhsIt == this->ipart.rend())
+        if (lhsIt == n1->ipart.rend())
             lhsEnd = true;
         
         int lhsVal = (!lhsEnd ? *lhsIt - '0' : 0);
@@ -356,6 +363,11 @@ Decimal Decimal::operator - (const Decimal& rhs) const
             debt.push(1);
             lhsVal += 10;
         }
+        result.push_back(lhsVal - rhsVal + '0');
+        if (!lhsEnd)
+            ++lhsIt;
+        if (!rhsEnd)
+            ++rhsIt;
     }
 
     if (negativeResult)
