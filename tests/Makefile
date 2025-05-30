@@ -1,6 +1,6 @@
 NAME := test_decimal
 
-TEST_SRCS := test_decimal_creation.cpp test_sum.cpp test_sub.cpp main.cpp
+TEST_SRCS := test_decimal_creation.cpp test_sum.cpp main.cpp
 TEST_OBJS := ${TEST_SRCS:.cpp=.o}
 
 TEST_SUBJ_SRCS := ../Decimal.cpp

@@ -19,6 +19,8 @@ class Decimal
         double num(void) const;
         std::string str(void) const;
 
+        static Decimal abs(const Decimal& n);
+
         Decimal& operator = (const Decimal& rhs);
 
         Decimal operator + (const Decimal& rhs) const;

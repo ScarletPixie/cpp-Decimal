@@ -2,6 +2,7 @@
 
 #include "../Decimal.hpp"
 
+#include <asm/signal.h>
 #include <csignal>
 
 namespace Catch
@@ -18,7 +19,7 @@ namespace Catch
     };
 }
 
-TEST_CASE("Test decimal returns a Decimal with thr correct result", "[Decimal sum]")
+TEST_CASE("Test decimal returns a Decimal with the correct result", "[Decimal sum]")
 {
     SECTION("Positive only")
     {
@@ -28,7 +29,23 @@ TEST_CASE("Test decimal returns a Decimal with thr correct result", "[Decimal su
         REQUIRE((Decimal(0) + Decimal("0.5")) == Decimal("0.5"));
         REQUIRE((Decimal(0) + Decimal("51")) == Decimal("51"));
         REQUIRE((Decimal(100.50) + Decimal("51")) == Decimal("151.50"));
-        REQUIRE((Decimal(-10) + Decimal(-10)) == Decimal("-20"));
-        REQUIRE((Decimal(5) + Decimal("-2")) == Decimal("3"));
+    }
+    SECTION("Mixed")
+    {
+        REQUIRE((Decimal(1) + Decimal(-1)) == Decimal("0"));
+        REQUIRE((Decimal(-1) + Decimal(1)) == Decimal("0"));
+        REQUIRE((Decimal(1) + Decimal(-2)) == Decimal("-1"));
+        REQUIRE((Decimal(-2) + Decimal(1)) == Decimal("-1"));
+        REQUIRE((Decimal(-1) + Decimal(-1)) == Decimal("-2"));
+    }
+    SECTION("Fractional")
+    {
+        raise(SIGTRAP);
+        REQUIRE((Decimal(0.3) + Decimal(-1)) == Decimal("0.7"));
+        REQUIRE((Decimal(-1) + Decimal(0.3)) == Decimal("0.7"));
+        REQUIRE((Decimal(1.5) + Decimal(-2)) == Decimal("-0.5"));
+        REQUIRE((Decimal(-2) + Decimal(1.5)) == Decimal("-0.5"));
+        REQUIRE((Decimal(-1.1) + Decimal(-1.1)) == Decimal("-2.2"));
+        REQUIRE((Decimal(0) + Decimal(-1.1)) == Decimal("-1.1"));
     }
 }

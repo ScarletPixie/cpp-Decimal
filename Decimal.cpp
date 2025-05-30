@@ -102,6 +102,12 @@ void Decimal::updateFromVal(void)
             this->ipart.push_back(this->val[i]);
     }
 }
+Decimal Decimal::abs(const Decimal& n)
+{
+    if (n.val[0] == '-')
+        return Decimal(n.val.substr(1));
+    return n;
+}
 
 
 // CTOR/DTOR
@@ -147,9 +153,19 @@ Decimal Decimal::operator + (const Decimal& rhs) const
     if (this->val[0] == '-' and rhs.val[0] == '-')
         isNegativeResult = true;
     else if (this->val[0] == '-')
-        return Decimal(this->val.substr(1)) - rhs;
+    {
+        Decimal lhs = Decimal::abs(*this);
+        if (lhs > rhs)
+            return -(lhs - rhs);
+        return rhs - lhs;
+    }
     else if (rhs.val[0] == '-')
-        return *this - Decimal(rhs.val.substr(1));
+    {
+        Decimal arhs = Decimal::abs(rhs);
+        if (arhs > *this)
+            return -(arhs - *this);
+        return *this - arhs;
+    }
 
     int carry = 0;
     const std::size_t maxDigitCount = std::max(this->ipart.size(), rhs.ipart.size());
@@ -425,7 +441,14 @@ bool Decimal::operator > (const Decimal& rhs) const
 
     return false;
 }
-
+bool Decimal::operator >= (const Decimal& rhs) const
+{
+    return *this > rhs or *this == rhs;
+}
+bool Decimal::operator < (const Decimal& rhs) const
+{
+    return !(*this >= rhs);
+}
 
 
 // EXCEPTIONS
